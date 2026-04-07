@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import logo from "@/assets/images/logo.png";
 import "./navbar.css"
 
 export default function Navbar() {
@@ -24,9 +25,15 @@ export default function Navbar() {
     const handleScroll = () => {
       const currentScroll = window.pageYOffset;
 
+      const scrollHeight = 
+        document.documentElement.scrollHeight - 
+        document.documentElement.clientHeight;
+
+      const isAtBottom = currentScroll >= scrollHeight - 5;
+
       setActiveHeader(currentScroll > 60);
 
-      if (currentScroll > lastScroll.current && currentScroll > 200) {
+      if ((currentScroll > lastScroll.current && currentScroll > 200) || isAtBottom) {
         setHideHeader(true);
       } else {
         setHideHeader(false);
@@ -49,18 +56,19 @@ export default function Navbar() {
       <div className="max-w-[1400px] mx-auto w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-3 flex items-center justify-between">
 
         {/* LOGO (re-animates on route change) */}
-        <div
-          key={location.pathname}
-          className="flex items-center gap-3 min-w-0 animate-fadeInLeft"
-        >
-          <div className="h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 rounded-full bg-white flex items-center justify-center text-black font-bold text-sm sm:text-base md:text-lg">
-            YL
-          </div>
+        <a href="/">
+          <div key={location.pathname} className="flex items-center gap-3 min-w-0 animate-fadeInLeft">
+            <img
+              src={logo}
+              alt="Yogesh Lilake Logo"
+              className="h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 rounded-full object-cover shadow-md"
+            />
 
-          <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold tracking-wide gradient-text whitespace-nowrap">
-            Yogesh Lilake
-          </span>
-        </div>
+            <span className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold tracking-wide gradient-text whitespace-nowrap">
+              Yogesh Lilake
+            </span>
+          </div>
+        </a>
 
         {/* NAV (DESKTOP) */}
         <nav className="hidden md:flex flex-1 justify-center items-center gap-4 lg:gap-6 xl:gap-8">
