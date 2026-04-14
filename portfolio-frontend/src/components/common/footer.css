@@ -1,3 +1,42 @@
+/**
+ * Footer Styling System
+ * ==========================================================
+ *
+ * OVERVIEW:
+ * - Handles advanced visual styling for Footer
+ *
+ * FEATURES:
+ * - Animated gradient background
+ * - Floating glowing orbs
+ * - Icon animations
+ * - Text glow effects
+ *
+ * ANIMATION SYSTEM:
+ * - fade-up → entry animation
+ * - glow-pulse → text/icon glow
+ * - icon-float → subtle floating effect
+ * - gradientMove → background animation
+ *
+ * PERFORMANCE:
+ * - Uses transform-based animations (GPU friendly)
+ * - Avoids layout-triggering properties
+ * - Uses will-change where needed
+ *
+ * DESIGN PRINCIPLES:
+ * - Subtle motion (not distracting)
+ * - Premium feel (glow + gradients)
+ *
+ * SCALABILITY:
+ * - Can be extracted into global design system
+ *
+ * DO NOT:
+ * - Do NOT override global styles
+ * - Do NOT add layout logic here
+ *
+ * RELATED:
+ * - /components/common/Footer.jsx
+ */
+
 @keyframes fade-up {
   from {
     opacity: 0;

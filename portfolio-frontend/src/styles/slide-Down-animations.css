@@ -1,0 +1,39 @@
+/**
+ * Animation System (Shared)
+ * ==========================================================
+ *
+ * OVERVIEW:
+ * - Centralized animation definitions used across components
+ *
+ * PURPOSE:
+ * - Maintain consistent motion design
+ * - Avoid duplicate animation definitions
+ *
+ * CURRENT ANIMATIONS:
+ * - slideDown → used in mobile navbar menu
+ *
+ * DESIGN PRINCIPLES:
+ * - Fast (<= 300ms)
+ * - Smooth (ease-out)
+ * - Minimal motion for better UX
+ *
+ * SCALABILITY:
+ * - Can evolve into full animation system
+ * - Can integrate with GSAP or Framer Motion
+ *
+ * DO NOT:
+ * - Do NOT define component-specific animations here
+ *
+ * RELATED:
+ * - /components/common/Navbar.jsx (mobile menu)
+ */
+
+/* Slide Down */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.25s ease-out;
+}
