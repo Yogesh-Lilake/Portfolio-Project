@@ -81,9 +81,9 @@ export default function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative flex items-center justify-center min-h-screen overflow-hidden bg-black"
+      className="relative flex items-center justify-center min-h-screen overflow-hidden"
     >
-      {/* 🌌 Background */}
+      {/* Background */}
       <div
         ref={bgRef}
         className="absolute inset-0 opacity-20 pointer-events-none"
