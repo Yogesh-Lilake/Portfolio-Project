@@ -19,7 +19,7 @@ import {
   FaGitAlt,
 } from "react-icons/fa";
 
-export const homeSkillsData = {
+export const skillsData = {
   title: "Skills",
 
   items: [

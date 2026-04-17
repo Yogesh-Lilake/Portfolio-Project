@@ -45,7 +45,7 @@ import { lazy, Suspense } from "react";
 
 const Hero = lazy(() => import("./components/Hero"));
 const About = lazy(() => import("./components/About"));
-const Skills = lazy(() => import("./components/Skills"));
+const Skills = lazy(() => import("@/features/shared/skills/components/Skills"));
 const Projects = lazy(() => import("./components/Projects"));
 const Contact = lazy(() => import("./components/Contact"));
 
@@ -54,7 +54,7 @@ export default function Home() {
     <Suspense fallback={<div className="text-center py-20">Loading...</div>}>
       <Hero />
       <About />
-      <Skills />
+      <Skills variant={"default"}/>
       <Projects />
       <Contact />
     </Suspense>

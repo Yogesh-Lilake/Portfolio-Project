@@ -37,16 +37,16 @@
  * - Do NOT hardcode skills
  *
  * RELATED:
- * - /constants/skills.js
- * - /features/public/home/animations/skillsAnimation.js
+ * - /features/shared/skills/data/skillsData.js
+ * - /features/shared/skills/animations/skillsAnimation.js
  */
 
 import { useEffect, useRef } from "react";
-import { homeSkillsData } from "@/features/public/home/data/homeSkillsData";
-import { runSkillsAnimation } from "@/features/public/home/animations/skillsAnimation";
+import { skillsData } from "@/features/shared/skills/data/skillsData";
+import { runSkillsAnimation } from "@/features/shared/skills/animations/skillsAnimation";
 import { getGridColsClass } from "@/shared/utils/uiClasses";
 
-export default function Skills() {
+export default function Skills({ data = skillsData, variant = "default", }) {
   const sectionRef = useRef(null);
   const cardsRef = useRef(null);
 
@@ -61,22 +61,34 @@ export default function Skills() {
 
   const gridClass = `
     grid 
-    grid-cols-${homeSkillsData.ui.columns.base}
-    sm:grid-cols-${homeSkillsData.ui.columns.sm}
-    md:grid-cols-${homeSkillsData.ui.columns.md}
-    lg:grid-cols-${homeSkillsData.ui.columns.lg}
-    xl:grid-cols-${homeSkillsData.ui.columns.xl}
+    grid-cols-${data.ui.columns.base}
+    sm:grid-cols-${data.ui.columns.sm}
+    md:grid-cols-${data.ui.columns.md}
+    lg:grid-cols-${data.ui.columns.lg}
+    xl:grid-cols-${data.ui.columns.xl}
     gap-5 sm:gap-6
   `;
+
+  // Section background control
+  const sectionBg =
+    variant === "alt"
+      ? "bg-[#0F172A]" // About page background
+      : "bg-none"; // Home page (no bg)
+
+  // Card background control
+  const cardBg =
+    variant === "alt"
+      ? "bg-[#1E293B]"
+      : "bg-[#1E293B]";
 
   return (
     <section
       ref={sectionRef}
-      className="py-20 px-4 sm:px-10 lg:px-20 text-center"
+      className={`py-20 px-4 sm:px-10 lg:px-20 text-center ${sectionBg}`}
     >
       <div className="max-w-6xl mx-auto">
         <h3 className="text-3xl sm:text-4xl font-bold mb-12 text-accent">
-          {homeSkillsData.title}
+          {data.title}
         </h3>
       </div>
 
@@ -84,14 +96,14 @@ export default function Skills() {
         ref={cardsRef}
         className={`${gridClass}`}
       >
-        {homeSkillsData.items.map((skill) => {
+        {data.items.map((skill) => {
           const Icon = skill.icon;
 
           return (
             <div
               key={skill.name}
               data-animate="card"
-              className="
+              className={`
                 group/card p-4 bg-[#1E293B] rounded-xl 
                 flex flex-col items-center gap-2
 
@@ -107,8 +119,10 @@ export default function Skills() {
                 hover:!scale-110 hover:!opacity-100 hover:z-10
 
                 shadow-md hover:shadow-[0_10px_30px_rgba(255,0,0,0.35)]
+
+                ${cardBg}
                 hover:bg-accent hover:text-darkbg
-              "
+              `}
             >
               <Icon
                 className={`
