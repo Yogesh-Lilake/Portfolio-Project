@@ -42,8 +42,9 @@
  */
 
 import { useEffect, useRef } from "react";
-import { skills } from "@/constants/skills";
+import { homeSkillsData } from "@/features/public/home/data/homeSkillsData";
 import { runSkillsAnimation } from "@/features/public/home/animations/skillsAnimation";
+import { getGridColsClass } from "@/shared/utils/uiClasses";
 
 export default function Skills() {
   const sectionRef = useRef(null);
@@ -58,6 +59,16 @@ export default function Skills() {
     return cleanup;
   }, []);
 
+  const gridClass = `
+    grid 
+    grid-cols-${homeSkillsData.ui.columns.base}
+    sm:grid-cols-${homeSkillsData.ui.columns.sm}
+    md:grid-cols-${homeSkillsData.ui.columns.md}
+    lg:grid-cols-${homeSkillsData.ui.columns.lg}
+    xl:grid-cols-${homeSkillsData.ui.columns.xl}
+    gap-5 sm:gap-6
+  `;
+
   return (
     <section
       ref={sectionRef}
@@ -65,15 +76,15 @@ export default function Skills() {
     >
       <div className="max-w-6xl mx-auto">
         <h3 className="text-3xl sm:text-4xl font-bold mb-12 text-accent">
-          Skills
+          {homeSkillsData.title}
         </h3>
       </div>
 
       <div
         ref={cardsRef}
-        className="group grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-5 sm:gap-6"
+        className={`${gridClass}`}
       >
-        {skills.map((skill) => {
+        {homeSkillsData.items.map((skill) => {
           const Icon = skill.icon;
 
           return (

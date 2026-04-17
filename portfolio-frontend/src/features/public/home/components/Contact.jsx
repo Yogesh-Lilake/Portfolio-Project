@@ -43,6 +43,8 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { runContactAnimation } from "@/features/public/home/animations/contactAnimation";
+import { homeContactData } from "@/features/public/home/data/homeContactData";
+import { getTextAlignClass, getMaxWidthClass } from "@/shared/utils/uiClasses";
 
 export default function Contact() {
   const sectionRef = useRef(null);
@@ -61,37 +63,45 @@ export default function Contact() {
     return cleanup;
   }, []);
 
+  const alignClass = getTextAlignClass(homeContactData.ui.align);
+  const widthClass = getMaxWidthClass(homeContactData.ui.maxWidth);
+
   return (
     <section
       ref={sectionRef}
-      className="py-20 px-4 sm:px-10 lg:px-20 text-center"
+      className={`py-20 px-4 sm:px-10 lg:px-20 ${alignClass}`}
     >
       <h3
         ref={titleRef}
         className="text-3xl sm:text-4xl font-bold mb-8 text-accent"
       >
-        Let’s Build Something Great
+        {homeContactData.title}
       </h3>
 
       <p
         ref={textRef}
-        className="text-gray-300 mb-10 max-w-[46rem] mx-auto text-base sm:text-lg"
+        className={`text-gray-300 mb-10 ${widthClass} mx-auto text-base sm:text-lg`}
       >
-        I’m always open to discussing new projects, creative ideas, or opportunities to collaborate.
+        {homeContactData.description}
       </p>
 
-      <Link to="/contact">
+      <Link to={homeContactData.cta.link}>
         <button
           ref={btnRef}
           data-animate="cta"
-          className="
-            bg-accent text-darkbg px-6 py-3 rounded-full font-semibold
+          className={`
+            px-6 py-3 rounded-full font-semibold
             transition-all duration-300
             transform hover:-translate-y-1 hover:scale-105
             shadow-md hover:shadow-[0_10px_30px_rgba(255,0,0,0.4)]
-          "
+            ${
+              homeContactData.cta.type === "primary"
+                ? "bg-accent text-darkbg"
+                : "border border-accent text-accent hover:bg-accent hover:text-darkbg"
+            }
+          `}
         >
-          Get In Touch
+          {homeContactData.cta.label}
         </button>
       </Link>
     </section>

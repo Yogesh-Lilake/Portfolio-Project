@@ -49,7 +49,8 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { runProjectsAnimation } from "@/features/public/home/animations/projectsAnimation";
-import { projects } from "@/constants/projects";
+import { homeProjectsData } from "@/features/public/home/data/homeProjectsData";
+import { PROJECT_GRID_VARIANTS } from "@/features/public/home/config/projectUI";
 
 export default function Projects() {
   const sectionRef = useRef(null);
@@ -66,20 +67,22 @@ export default function Projects() {
     return cleanup;
   }, []);
 
+  const gridClass = PROJECT_GRID_VARIANTS[homeProjectsData.ui.gridVariant];
+
   return (
     <section
       ref={sectionRef}
       className="py-20 px-4 sm:px-10 lg:px-20 bg-[#111827]"
     >
       <h2 className="text-3xl sm:text-4xl font-bold mb-12 text-center text-accent">
-        Featured Projects
+        {homeProjectsData.title}
       </h2>
 
       <div
         ref={cardsRef}
-        className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3 max-w-screen-xl mx-auto"
+        className={`${gridClass} max-w-screen-xl mx-auto`}
       >
-        {projects.map((project) => (
+        {homeProjectsData.items.map((project) => (
           <div
             key={project.id}
             data-animate="card"
@@ -123,12 +126,12 @@ export default function Projects() {
 
       {/* CTA */}
       <div className="flex justify-center mt-28">
-        <Link to="/projects">
+        <Link to={homeProjectsData.cta.link}>
           <button
             ref={buttonRef}
             className="border border-accent text-accent px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 hover:bg-accent hover:text-darkbg shadow-md hover:shadow-[0_10px_30px_rgba(255,0,0,0.4)]"
           >
-            See All Projects
+            {homeProjectsData.cta.label}
           </button>
         </Link>
       </div>

@@ -31,6 +31,7 @@
  * - Lottie uses lightweight SVG renderer
  *
  * ACCESSIBILITY:
+ * - Only UI parts (Not data or animation) are focusable
  * - Text-first fallback (animation not required)
  *
  * SCALABILITY:
@@ -45,15 +46,15 @@
  *
  * RELATED:
  * - /features/public/home/animations/heroAnimation.js
+ * - /features/public/home/data/homeHeroData.js
  */
 
 import { useEffect, useRef } from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { Link } from "react-router-dom";
 import { runHeroAnimation } from "@/features/public/home/animations/heroAnimation";
+import { homeHeroDate } from "@/features/public/home/data/homeHeroData";
 
-import HeroAnimation from "@/assets/lottie/computer.lottie";
-import Hand from "@/assets/lottie/waving-hand.lottie";
 
 export default function HeroSection() {
   const sectionRef = useRef(null);
@@ -83,13 +84,14 @@ export default function HeroSection() {
       ref={sectionRef}
       className="relative flex items-center justify-center min-h-screen overflow-hidden"
     >
-      {/* Background */}
+      {/* Background Animation*/}
       <div
         ref={bgRef}
-        className="absolute inset-0 opacity-20 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
+        style={{ opacity: homeHeroDate.ui.backgroundOpacity }}
       >
         <DotLottieReact
-          src={HeroAnimation}
+          src={homeHeroDate.animations.background}
           loop
           autoplay
           className="w-full h-full"
@@ -103,51 +105,66 @@ export default function HeroSection() {
           ref={titleRef}
           className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 text-accent"
         >
-          <span>Hi, I'm Yogesh</span>
-
-          <span
-            ref={handRef}
-            className="max-[640px]:hidden inline-block align-middle"
-            style={{ width: "1.2em", height: "1.2em" }}
-          >
-            <DotLottieReact
-              src={Hand}
-              loop
-              autoplay
-              className="w-full h-full"
-              renderer="svg"
-            />
+          <span>
+            {homeHeroDate.greeting} {homeHeroDate.name}
           </span>
+
+          {homeHeroDate.ui.showHand && (
+            <span
+              ref={handRef}
+              className="max-[640px]:hidden inline-block align-middle"
+              style={{ width: "1.2em", height: "1.2em" }}
+            >
+              <DotLottieReact
+                src={homeHeroDate.animations.hand}
+                loop
+                autoplay
+                className="w-full h-full"
+                renderer="svg"
+              />
+            </span>
+          )}
         </h1>
 
         <p
           ref={subtitleRef}
           className="text-base sm:text-lg md:text-xl text-gray-300 mb-6"
         >
-          Full Stack Developer | Android Developer | Problem Solver
+          {homeHeroDate.subtitle}
         </p>
 
-        <p
-          ref={descRef}
-          className="text-gray-400 max-w-2xl mx-auto mb-10"
-        >
-          I build modern, responsive, and high-performance web applications.
+        <p ref={descRef} className="text-gray-400 max-w-2xl mx-auto mb-10">
+          {homeHeroDate.description}
         </p>
 
         {/* Buttons */}
-        <div
-          ref={buttonsRef}
-          className="flex flex-wrap justify-center gap-4"
-        >
-          <Link to="/projects">
-            <button className="bg-accent text-darkbg px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-1 hover:scale-105 shadow-md hover:shadow-[0_10px_30px_rgba(255,0,0,0.4)]">
-              View Projects
-            </button>
-          </Link>
+        <div ref={buttonsRef} className="flex flex-wrap justify-center gap-4">
+          {homeHeroDate.buttons.map((btn, index) => {
+            if (btn.link) {
+              return (
+                <Link key={index} to={btn.link}>
+                  <button
+                    className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-1 hover:scale-105 shadow-md ${
+                      btn.type === "primary"
+                        ? "bg-accent text-darkbg hover:shadow-[0_10px_30px_rgba(255,0,0,0.4)]"
+                        : "border border-accent text-accent hover:bg-accent hover:text-darkbg hover:shadow-[0_10px_30px_rgba(255,0,0,0.4)]"
+                    }`}
+                  >
+                    {btn.label}
+                  </button>
+                </Link>
+              );
+            }
 
-          <button className="border border-accent text-accent px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-accent hover:text-darkbg shadow-md hover:shadow-[0_10px_30px_rgba(255,0,0,0.4)]">
-            Download CV
-          </button>
+            return (
+              <button
+                key={index}
+                className="border border-accent text-accent px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:bg-accent hover:text-darkbg shadow-md hover:shadow-[0_10px_30px_rgba(255,0,0,0.4)]"
+              >
+                {btn.label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>

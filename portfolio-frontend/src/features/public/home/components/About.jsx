@@ -43,6 +43,8 @@
 
 import { useEffect, useRef } from "react";
 import { runAboutAnimation } from "@/features/public/home/animations/aboutAnimation";
+import { homeAboutData } from "@/features/public/home/data/homeAboutData";
+import { getTextAlignClass, getMaxWidthClass } from "@/shared/utils/uiClasses";
 
 export default function About() {
   const sectionRef = useRef(null);
@@ -59,37 +61,47 @@ export default function About() {
     return cleanup;
   }, []);
 
+  const alignClass = getTextAlignClass(homeAboutData.ui.textAlign);
+  const widthClass = getMaxWidthClass(homeAboutData.ui.maxWidth);
+
   return (
     <section
       ref={sectionRef}
-      className="py-20 px-4 sm:px-10 lg:px-20 text-center bg-[#111827]"
+      className="py-20 px-4 sm:px-10 lg:px-20"
+      style={{ background: homeAboutData.ui.background }}
     >
       <h2
         ref={titleRef}
-        className="text-3xl sm:text-4xl font-bold mb-8 text-accent"
+        className={`text-3xl sm:text-4xl font-bold mb-8 text-accent ${alignClass}`}
       >
-        About Me
+        {homeAboutData.title}
       </h2>
 
+      {/* Content */}
       <p
         ref={textRef}
-        className="max-w-3xl mx-auto text-gray-300 leading-relaxed text-base sm:text-lg lg:text-xl"
+        className={`${widthClass} mx-auto text-gray-300 leading-relaxed text-base sm:text-lg lg:text-xl ${alignClass}`}
       >
-        I’m a passionate{" "}
-        <span data-animate="highlight" className="text-white font-semibold">
-          Full Stack Developer
-        </span>{" "}
-        with experience in{" "}
-        <span data-animate="highlight" className="text-accent">
-          PHP, MySQL, JavaScript, Tailwind, and Android Development
-        </span>
-        . I love solving complex problems, designing scalable systems, and
-        building clean user experiences. With strong foundations in{" "}
-        <span data-animate="highlight" className="font-semibold">
-          DSA, Java, and API integration
-        </span>
-        , I bring both engineering precision and creative flair to every
-        project.
+        {homeAboutData.content.map((item, index) => {
+          if (!item.highlight) {
+            return <span key={index}>{item.text}</span>;
+          }
+
+          const highlightClass =
+            item.highlight === "primary"
+              ? "text-white font-semibold"
+              : "text-accent";
+
+          return (
+            <span
+              key={index}
+              data-animate="highlight"
+              className={highlightClass}
+            >
+              {item.text}
+            </span>
+          );
+        })}
       </p>
     </section>
   );
