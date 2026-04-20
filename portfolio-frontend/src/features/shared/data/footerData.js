@@ -1,50 +1,46 @@
 /**
- * FOOTER DATA CONFIG (GLOBAL SHARED)
- * =====================================
+ * FOOTER DATA CONFIG (PRODUCTION-READY)
+ * ============================================
  *
  * PURPOSE:
  * - Centralized footer configuration
- * - Reusable across layouts
- * - CMS/API ready
+ * - Fully data-driven rendering
  *
- * SCALABILITY:
- * - Add sections (newsletter, services, etc.)
- * - Replace with API without touching UI
+ * DESIGN:
+ * - Separates content, structure, and UI flags
+ *
+ * FUTURE:
+ * - CMS / API integration ready
  */
 
 export const footerData = {
   brand: {
-    name: "YogeshLilake",
+    name: "Yogesh Lilake",
 
     description:
       "Building modern, responsive and high-performance web applications with clean UI and smooth user experience.",
-
-    contact: {
-      location: "Mumbai, India",
-      email: "yogesh@email.com",
-    },
   },
 
   sections: [
     {
       id: "navigation",
       title: "Quick Links",
-      type: "navigation", // uses navigationData
+      type: "navigation",
+      dataSource: "navigationData",
     },
     {
       id: "social",
       title: "Connect",
-      type: "social", // uses socialData
+      type: "social",
+      dataSource: "socialData",
       description:
         "Follow me for updates on projects, coding tips and development journey.",
     },
   ],
 
   bottomBar: {
-    show: true,
-    copyright:
-      "{year} Yogesh Portfolio. All Rights Reserved.",
-
+    enabled: true,
+    copyright: "{year} Yogesh Portfolio. All Rights Reserved.",
     credits: {
       text: "Designed & Developed by",
       name: "Yogesh Lilake",
@@ -52,8 +48,10 @@ export const footerData = {
   },
 
   ui: {
-    showBackgroundEffects: true,
-    showOrbs: true,
-    showGlowLine: true,
+    background: {
+      enabled: true,
+      orbs: true,
+      glowLine: true,
+    },
   },
 };

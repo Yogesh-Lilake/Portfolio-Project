@@ -1,94 +1,99 @@
 /**
- * Footer Component (Global Information + Navigation)
+ * ==========================================================
+ * FOOTER (APPLICATION SHELL COMPONENT)
  * ==========================================================
  *
- * OVERVIEW:
- * - Represents the bottom section of the application
- * - Provides branding, navigation, and social connectivity
+ * PURPOSE:
+ * - Global footer rendered across all public pages
+ * - Displays branding, navigation, contact info, and social links
  *
- * RESPONSIBILITIES:
- * - Display brand identity
- * - Provide quick navigation links
- * - Show contact information
- * - Link to social platforms
+ * ARCHITECTURE:
+ * - Pure presentational component
+ * - Fully data-driven (no hardcoded content)
  *
- * ARCHITECTURE ROLE:
- * - Layout-level component
- * - Mounted inside MainLayout
+ * DATA SOURCES:
+ * - footerData      -> structure & UI flags
+ * - navigationData  -> internal navigation links
+ * - contactData     -> email, location, etc.
+ * - socialData      -> external platforms
  *
- * DEPENDENCIES:
- * - navigation.js → quick links
- * - socialLinks.js → social media links
- * - footer.css → styling and animations
- * - react-icons → icons
+ * UI CONFIG:
+ * - contactUIConfig -> controls contact rendering
+ * - socialUIConfig  -> controls social rendering
  *
- * STRUCTURE:
- * - Brand section (intro + contact)
- * - Quick Links (navigation reuse)
- * - Social Links (external platforms)
- * - Bottom bar (copyright)
+ * LOGIC LAYER:
+ * - getVisibleItems() handles:
+ *    - visibility rules (pages, roles)
+ *    - sorting (priority)
+ *    - limiting (UX control)
  *
- * DESIGN FEATURES:
- * - Animated gradient background
- * - Floating glowing orbs
- * - Icon hover animations
- * - Subtle motion system
- *
- * UX:
- * - Encourages user engagement (social links)
- * - Provides quick navigation fallback
- *
- * SCALABILITY:
- * - Easily extendable:
- *    - Newsletter signup
- *    - Dynamic content (CMS/API)
- *    - Multi-language support
+ * DESIGN PRINCIPLES:
+ * - Separation of concerns (data vs UI vs logic)
+ * - Config-driven rendering
+ * - Scalable section system
  *
  * ACCESSIBILITY:
- * - aria-label for social links
- * - semantic structure
+ * - aria-label for external links
+ * - semantic HTML structure
  *
  * DO NOT:
- * - Do NOT hardcode navigation links
- * - Do NOT add heavy logic
+ * - Do NOT add business logic here
+ * - Do NOT hardcode values
  *
- * RELATED FILES:
- * - /layouts/MainLayout.jsx    -> mounts Footer
- * - /features/shared/data/navigationData.js   -> provides navigation config
- * - /features/shared/data/socialData.js  -> provides social media links 
+ * ==========================================================
  */
 
-import { FaLocationDot } from "react-icons/fa6";
-import { MdEmail } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { navigationData } from "@/features/shared/data/navigationData";
 import { footerData } from "@/features/shared/data/footerData";
+import { contactData } from "@/features/shared/data/contactData";
 import { socialData } from "@/features/shared/data/socialData";
 import { FaRegCopyright } from "react-icons/fa";
+import { contactUIConfig } from "@/shared/config/contactUIConfig";
+import { socialUIConfig } from "@/shared/config/socialUIConfig";
+import { getVisibleItems } from "@/shared/utils/filterItems";
 import "./footer.css";
 
 export default function Footer() {
   const year = new Date().getFullYear();
 
+  // ================================
+  // CONFIGS
+  // ================================
+  const contactsConfig = contactUIConfig.footer;
+  const socialsConfig = socialUIConfig.footer;
+
+  const contacts = getVisibleItems({
+    items: contactData.items,
+    page: "footer",
+    limit: contactsConfig.limit,
+  });
+
+  const socials = getVisibleItems({
+    items: socialData.items,
+    page: "footer",
+    role: "guest",
+    limit: socialsConfig.limit,
+  });
+
   return (
     <footer className="text-color font-medium mt-24 border-t border-[#ffffff08] relative">
       {/* Background Effects */}
-      {footerData.ui.showBackgroundEffects && (
+      {footerData.ui.background.enabled && (
         <>
           <div className="footer-bg"></div>
 
-          {footerData.ui.showOrbs && (
+          {footerData.ui.background.orbs && (
             <>
               <div className="orb"></div>
               <div className="orb"></div>
               <div className="orb"></div>
             </>
           )}
-          
-          {footerData.ui.showGlowLine && <div className="footer-glow"></div>}
+
+          {footerData.ui.background.glowLine && <div className="footer-glow"></div>}
         </>
       )}
-      
 
       <div
         className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 
@@ -104,15 +109,30 @@ export default function Footer() {
           </p>
 
           <div className="text-gray-500 text-sm space-y-1 pt-2">
-            <p className="flex items-center gap-2 text-gray-500 text-sm">
-              <FaLocationDot className="text-red-500" />
-              {footerData.brand.contact.location}
-            </p>
+            {contacts.map((item) => {
+              const Icon = item.icon;
 
-            <p className="flex items-center gap-2 text-gray-500 text-sm">
-              <MdEmail className="text-red-500" />
-              {footerData.brand.contact.email}
-            </p>
+              return (
+                <div
+                  key={item.type}
+                  className="flex items-center gap-2 text-gray-500 text-sm"
+                >
+                  <Icon
+                    size={contactsConfig.iconSize}
+                    className="text-red-500"
+                  />
+
+                  {contactsConfig.showLabel && (
+                    <p className="text-sm text-gray-400">{item.label}</p>
+                  )}
+                  {item.href ? (
+                    <a href={item.href}>{item.value} </a>
+                  ) : (
+                    item.value
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -145,16 +165,13 @@ export default function Footer() {
 
           if (section.type === "social") {
             return (
-              <div
-                key={section.id}
-                className="animate-[fade-up_1s_ease-out]"
-              >
+              <div key={section.id} className="animate-[fade-up_1s_ease-out]">
                 <h3 className="text-white font-semibold mb-3 text-lg w-fit pb-1 border-b border-[rgba(211,47,47,0.4)]">
                   {section.title}
                 </h3>
 
                 <div className="flex flex-wrap gap-5 mt-3">
-                  {socialData.items.map((social) => {
+                  {socials.map((social) => {
                     const Icon = social.icon;
 
                     return (
@@ -166,7 +183,7 @@ export default function Footer() {
                         aria-label={social.name}
                         className="social-icon text-gray-400 text-2xl"
                       >
-                        <Icon size={socialData.ui.iconSize} />
+                        <Icon size={socialsConfig.iconSize} />
                       </Link>
                     );
                   })}
@@ -189,14 +206,15 @@ export default function Footer() {
       <div className="border-t border-[#222] relative z-10"></div>
 
       {/* Bottom Section */}
-      {footerData.bottomBar.show && (
+      {footerData.bottomBar.enabled && (
         <div
           className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 
                      flex flex-col md:flex-row justify-between items-center 
                      text-sm sm:text-base text-gray-400 text-center gap-2"
         >
           <p className="animate-[fade-up_1.2s_ease-out]">
-            <FaRegCopyright className="inline mr-1" /> {footerData.bottomBar.copyright.replace("{year}", year)}
+            <FaRegCopyright className="inline mr-1" />
+            {footerData.bottomBar.copyright.replace("{year}", year)}
           </p>
 
           <p className="animate-[fade-up_1.4s_ease-out]">
