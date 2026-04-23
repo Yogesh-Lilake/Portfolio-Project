@@ -65,7 +65,7 @@ import MainLayout from "@/layouts/MainLayout";
 import Home from "@/features/public/home/Home";
 import About from "@/features/public/about/About";
 import Projects from "@/features/public/projects/Projects";
-import ProjectDetails from "@/features/public/projects/ProjectDetails";
+import ProjectDetails from "@/features/public/projects/components/ProjectDetails";
 import Contact from "@/features/public/contact/Contact";
 import NotFound from "@/features/shared/NotFound";
 
