@@ -13,11 +13,11 @@ export const navigationData = {
   },
 
   links: [
-    { label: "Home", path: "/" },
-    { label: "About", path: "/about" },
-    { label: "Projects", path: "/projects" },
-    { label: "Notes", path: "/notes" },
-    { label: "Contact", path: "/contact" },
+    { label: "Home", path: "/", status: "active" },
+    { label: "About", path: "/about", status: "active" },
+    { label: "Projects", path: "/projects", status: "active" },
+    { label: "Notes", path: "/notes", status: "coming-soon" },
+    { label: "Contact", path: "/contact", status: "active" },
   ],
 
   cta: {

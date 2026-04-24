@@ -1,83 +1,97 @@
 /**
- * PublicRoutes (Main Application Routing Layer)
+ * PublicRoutes (Public Domain Routing Orchestrator)
  * ==========================================================
  *
  * OVERVIEW:
- * - Handles all publicly accessible routes of the application
- * - Represents the main user-facing website (portfolio)
+ * - Entry point for all public-facing routes (portfolio website)
+ * - Uses a system-driven routing architecture (config + controller)
+ * - Delegates rendering logic to StatusRoute instead of direct page mapping
  *
  * ARCHITECTURE ROLE:
- * - Domain router for "public" section
- * - Mounted inside AppRouter as primary route tree
+ * - Domain-level router for "public" application scope
+ * - Mounted inside AppRouter as the primary route tree
+ * - Bridges route configuration (routeConfig) with rendering engine (StatusRoute)
  *
- * ROUTE STRUCTURE:
- * - /                -> Home
- * - /about           -> About page
- * - /projects        -> Projects listing
- * - /projects/:slug  -> Project details (dynamic route)
- * - /contact         -> Contact page
+ * ROUTING MODEL (IMPORTANT):
+ * - Routes are NOT hardcoded
+ * - Routes are defined in `routeConfig`
+ * - Rendering behavior is controlled by `StatusRoute`
+ *
+ * ROUTING FLOW:
+ * 1. Browser matches path
+ * 2. routeConfig provides:
+ *      - path
+ *      - component
+ *      - status (active / coming-soon / maintenance)
+ * 3. StatusRoute decides what to render:
+ *      - active -> actual page component
+ *      - coming-soon -> ComingSoon page
+ *      - maintenance -> maintenance UI
+ *      - fallback -> NotFound
  *
  * LAYOUT SYSTEM:
  * - All routes are wrapped inside `MainLayout`
- * - Ensures consistent UI:
+ * - Ensures consistent UI across pages:
  *    Navbar + ScrollProgress + Footer
  *
  * RESPONSIBILITIES:
- * - Define public route hierarchy
- * - Attach layout to all pages
- * - Handle fallback routing (NotFound)
+ * - Map routeConfig into React Router <Route> elements
+ * - Attach MainLayout to all public routes
+ * - Provide fallback route (NotFound)
  *
- * DYNAMIC ROUTING:
- * - `/projects/:slug` supports dynamic project pages
- * - Enables SEO-friendly URLs
- *
- * DEPENDENCIES:
- * - MainLayout -> global layout wrapper
- * - Feature pages (Home, About, Projects, Contact)
- * - NotFound -> fallback for unknown routes
- *
- * ROUTING FLOW:
- * 1. Route matches path
- * 2. Wrapped with MainLayout
- * 3. Corresponding page rendered inside <Outlet />
+ * KEY DESIGN PRINCIPLE:
+ * - PublicRoutes does NOT decide page behavior
+ * - It only connects:
+ *      config -> controller -> layout
  *
  * SCALABILITY:
+ * - Add new route -> only update routeConfig
+ * - Add new state -> extend StatusRoute (no changes here)
  * - Supports:
- *    - Lazy loading (React.lazy)
- *    - Code splitting per page
- *    - SEO optimization
- *    - Future public modules (blog, notes, etc.)
+ *    - Lazy loading
+ *    - Feature flags
+ *    - CMS-driven routing (future)
  *
  * DO NOT:
- * - Do NOT add authentication logic here
- * - Do NOT mix admin routes here
- * - Do NOT add layout logic inside pages
+ * - Do NOT hardcode routes here
+ * - Do NOT add business logic here
+ * - Do NOT conditionally render pages here
+ * - Do NOT bypass StatusRoute
  *
  * RELATED FILES:
  * - /app/router/AppRouter.jsx
+ * - /app/router/routeConfig.jsx
+ * - /app/router/StatusRoute.jsx
  * - /layouts/MainLayout.jsx
+ * - /features/shared/ComingSoon.jsx
  * - /features/shared/NotFound.jsx
  */
 
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
 
-import Home from "@/features/public/home/Home";
-import About from "@/features/public/about/About";
-import Projects from "@/features/public/projects/Projects";
-import ProjectDetails from "@/features/public/projects/components/ProjectDetails";
-import Contact from "@/features/public/contact/Contact";
+import StatusRoute from "./StatusRoute";
+import { routeConfig } from "./routeConfig";
+
 import NotFound from "@/features/shared/NotFound";
 
 export default function PublicRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="projects/:slug" element={<ProjectDetails />} />
-        <Route path="contact" element={<Contact />} />
+        {/* Dynamic Routes */}
+        {routeConfig.map((route, index) => (
+          <Route
+            key={index}
+            path={route.path}
+            element={
+              <StatusRoute
+                element={route.element}
+                status={route.status}
+              />
+            }
+          />
+        ))}
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

@@ -1,27 +1,33 @@
 /**
- * Navbar Component (Global Navigation System)
+ * Navbar Component (Global Navigation Layer)
  * ==========================================================
  *
  * OVERVIEW:
- * - This component represents the primary navigation layer of the application.
- * - It is globally mounted inside `MainLayout.jsx` and persists across all routes.
- *
- * RESPONSIBILITIES:
- * - Route navigation (via react-router)
- * - Branding (logo + identity)
- * - Primary CTA (Hire Me)
- * - Responsive navigation (desktop + mobile)
- * - Scroll-based UI behavior (sticky, hide-on-scroll)
+ * - Primary navigation system of the application
+ * - Persisted across all public routes via MainLayout
  *
  * ARCHITECTURE ROLE:
  * - Acts as a "Layout-level Component"
- * - Used inside: `/layouts/MainLayout.jsx`
- * - Consumes config from: `/constants/navigation.js`
+ * - Responsible ONLY for navigation rendering
+ * - Delegates route behavior (active / coming-soon / fallback)
+ *   to the routing system (StatusRoute)
+ *
+ * KEY PRINCIPLE:
+ * - Navbar = navigation UI
+ * - Routing = behavior & state handling
+ *
+ * ROUTING BEHAVIOR:
+ * - All links are ALWAYS clickable
+ * - No conditional UI logic (no disable / no blocking)
+ * - Route-level system decides what to render:
+ *    - Active → Page
+ *    - Coming Soon → ComingSoon page
+ *    - Unknown → NotFound page
  *
  * DEPENDENCIES:
  * - react-router-dom → routing (NavLink, Link, useLocation)
  * - react-icons → UI icons
- * - navigation.js → centralized navigation config
+ * - navigationData.js → centralized navigation config (source of truth)
  * - navbar.css → component-specific styling
  * - slide-Down-animations.css → animation system
  *
@@ -33,43 +39,52 @@
  * SCROLL ENGINE (Performance Optimized):
  * - Uses requestAnimationFrame (RAF) to throttle scroll updates
  * - Prevents unnecessary re-renders
- * - Uses `passive: true` for better scroll performance
+ * - Uses passive event listeners for smooth scrolling
  *
  * UX FEATURES:
  * - Sticky header with blur effect
  * - Auto-hide on downward scroll
- * - Active route highlighting
+ * - Active route highlighting (NavLink)
  * - Animated underline on hover
- * - Mobile dropdown with animation
+ * - Responsive mobile menu with animation
  * - CTA button with hover/scale interaction
  *
  * ACCESSIBILITY:
- * - aria-label + aria-expanded for menu button
+ * - aria-label + aria-expanded for mobile menu toggle
  * - Semantic navigation structure
  *
  * SCALABILITY:
- * - Navigation items are NOT hardcoded (comes from NAV_LINKS)
+ * - Navigation is config-driven (navigationData.js)
+ * - No hardcoded routes inside component
  * - Easily extendable for:
  *    - Role-based navigation
- *    - Dynamic API-driven menus
+ *    - Feature flags
+ *    - API-driven menus
+ *
+ * DESIGN DECISIONS:
+ * - No "disabled" navigation items
+ * - No "Coming Soon" UI indicators inside Navbar
+ * - Keeps UI clean and predictable
+ * - Avoids mixing navigation with product state logic
  *
  * KNOWN EXTENSIONS (Future):
- * - Add auth-aware navigation (login/logout)
- * - Add notification system
- *
+ * - Auth-aware navigation (login/logout)
+ * - Notification / badge system (separate from navigation logic)
+ * - Dynamic user-based menus
  *
  * RELATED FILES:
- * - /layouts/MainLayout.jsx            -> mounts Navbar
- * - /features/shared/data/navigationData.js           -> navigation config
- * - /components/common/Footer.jsx      -> shares navigation links
- * - /styles/slide-Down-animations.css  -> animation system
- *
+ * - /layouts/MainLayout.jsx
+ * - /app/router/PublicRoutes.jsx
+ * - /app/router/StatusRoute.jsx
+ * - /features/shared/data/navigationData.js
+ * - /features/shared/ComingSoon.jsx
+ * - /features/shared/NotFound.jsx
  */
 
 import { NavLink, Link, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
-import { navigationData } from "@/features/shared/data/navigationData"; 
+import { navigationData } from "@/features/shared/data/navigationData";
 import "@/styles/slide-Down-animations.css";
 import "./navbar.css";
 
@@ -98,7 +113,7 @@ export default function Navbar() {
 
         setActiveHeader(currentScroll > 60);
         setHideHeader(
-          currentScroll > lastScroll.current && currentScroll > 200
+          currentScroll > lastScroll.current && currentScroll > 200,
         );
 
         lastScroll.current = currentScroll;
@@ -133,6 +148,41 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ==============================
+  // Render Link
+  // ==============================
+  const renderNavLink = (link, isMobile = false) => {
+    const baseClass = isMobile
+      ? "text-gray-300 hover:text-red-400 flex items-center gap-2"
+      : "group relative flex items-center gap-2 text-sm sm:text-base md:text-lg font-medium transition-all duration-300";
+
+    return (
+      <NavLink
+        key={link.path}
+        to={link.path}
+        end={link.path === "/"}
+        className={({ isActive }) =>
+          `${baseClass}
+          ${!isMobile && (isActive ? "text-red-400" : "text-gray-300 hover:text-red-400")}`
+        }
+      >
+        {({ isActive }) => (
+          <>
+            {link.label}
+
+            {/* Desktop underline */}
+            {!isMobile && (
+              <span
+                className={`absolute left-0 -bottom-1 h-[2px] bg-gradient-to-r from-red-500 to-orange-400 transition-all duration-300
+                ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+              />
+            )}
+          </>
+        )}
+      </NavLink>
+    );
+  };
+
   return (
     <header
       className={`sticky top-0 w-full z-50 transition-all duration-500
@@ -155,27 +205,7 @@ export default function Navbar() {
 
         {/* NAV (DESKTOP) */}
         <nav className="hidden md:flex flex-1 justify-center items-center gap-4 lg:gap-6 xl:gap-8">
-          {navigationData.links.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              end={link.path === "/"}
-              className={({ isActive }) =>
-                `group relative text-sm sm:text-base md:text-lg font-medium transition-all duration-300
-                ${isActive ? "text-red-400" : "text-gray-300 hover:text-red-400"}`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {link.label}
-                  <span
-                    className={`absolute left-0 -bottom-1 h-[2px] bg-gradient-to-r from-red-500 to-orange-400 transition-all duration-300
-                    ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
-                  />
-                </>
-              )}
-            </NavLink>
-          ))}
+          {navigationData.links.map((link) => renderNavLink(link))}
         </nav>
 
         {/* RIGHT SIDE */}
@@ -208,15 +238,7 @@ export default function Navbar() {
           className="md:hidden bg-[#0b0b0b] border-t border-white/10 px-6 py-4 animate-slideDown"
         >
           <nav className="flex flex-col gap-4">
-            {navigationData.links.map((link) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className="text-gray-300 hover:text-red-400"
-              >
-                {link.label}
-              </NavLink>
-            ))}
+            {navigationData.links.map((link) => renderNavLink(link, true))}
           </nav>
 
           <Link
